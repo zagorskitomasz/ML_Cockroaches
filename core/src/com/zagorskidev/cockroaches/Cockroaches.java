@@ -1,44 +1,55 @@
 package com.zagorskidev.cockroaches;
 
+import java.util.LinkedList;
+import java.util.List;
+
 import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.graphics.GL30;
+import com.zagorskidev.cockroaches.graphics.Drawer;
+import com.zagorskidev.cockroaches.input.EnvironmentEventsHandler;
+import com.zagorskidev.cockroaches.population.Population;
+import com.zagorskidev.cockroaches.timers.BirthTimer;
+import com.zagorskidev.cockroaches.timers.MoveTimer;
+import com.zagorskidev.cockroaches.timers.Timer;
 
 public class Cockroaches extends ApplicationAdapter {
-
+	
+	private List<Timer> timers;
+	private Drawer drawer;
+	
+	private Population cockroaches;
+	
 	@Override
 	public void create () {
 		initializeCockroaches();
-		startEvolution();
-	}
-	
-	private void initializeCockroaches() {
-		//TODO
+		initializeEnvironment();
+		initializeGameEngine();
 	}
 
-	private void startEvolution() {
-		
-		Gdx.app.postRunnable(new Runnable() {
-			public void run() {
-				//TODO
-			}
-		});
+	private void initializeCockroaches() {
+		cockroaches = new Population();
+	}
+	
+	private void initializeEnvironment() {
+		timers = new LinkedList<>();
+		timers.add(new MoveTimer(cockroaches));
+		timers.add(new BirthTimer(cockroaches));
+	}
+
+	private void initializeGameEngine() {
+		drawer = new Drawer(cockroaches);
+		Gdx.input.setInputProcessor(new EnvironmentEventsHandler(cockroaches));
 	}
 
 	@Override
 	public void render () {
-		
-		clear();
-		//TODO
-	}
-	
-	private void clear() {
-		Gdx.gl.glClearColor(0, 150, 0, 0);
-		Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
+		for(Timer timer : timers)
+			timer.checkAndPerform();
+		drawer.draw();
 	}
 	
 	@Override
 	public void dispose () {
-		//TODO
+		drawer.dispose();
 	}
 }
