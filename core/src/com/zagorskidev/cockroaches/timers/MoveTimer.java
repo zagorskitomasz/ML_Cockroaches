@@ -17,6 +17,12 @@ public class MoveTimer extends Timer{
 	protected void performAction() {
 		
 		for(Cockroach cockroach : cockroaches.getCockroaches())
-			cockroach.move();
+			move(cockroach);
+	}
+
+	private void move(Cockroach cockroach) {
+		if(cockroach.move()){
+			cockroaches.processEscape(cockroach);
+		}
 	}
 }

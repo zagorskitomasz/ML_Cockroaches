@@ -7,6 +7,7 @@ import com.badlogic.gdx.ApplicationAdapter;
 import com.badlogic.gdx.Gdx;
 import com.zagorskidev.cockroaches.graphics.Drawer;
 import com.zagorskidev.cockroaches.input.EnvironmentEventsHandler;
+import com.zagorskidev.cockroaches.population.Genome;
 import com.zagorskidev.cockroaches.population.Population;
 import com.zagorskidev.cockroaches.timers.BirthTimer;
 import com.zagorskidev.cockroaches.timers.MoveTimer;
@@ -14,10 +15,16 @@ import com.zagorskidev.cockroaches.timers.Timer;
 
 public class Cockroaches extends ApplicationAdapter {
 	
+	private final boolean isDesktop;
+	
 	private List<Timer> timers;
 	private Drawer drawer;
 	
 	private Population cockroaches;
+	
+	public Cockroaches(boolean isDesktop) {
+		this.isDesktop = isDesktop;
+	}
 	
 	@Override
 	public void create () {
@@ -27,7 +34,8 @@ public class Cockroaches extends ApplicationAdapter {
 	}
 
 	private void initializeCockroaches() {
-		cockroaches = new Population();
+		Genome genome = new Genome();
+		cockroaches = new Population(genome);
 	}
 	
 	private void initializeEnvironment() {
@@ -37,7 +45,7 @@ public class Cockroaches extends ApplicationAdapter {
 	}
 
 	private void initializeGameEngine() {
-		drawer = new Drawer(cockroaches);
+		drawer = new Drawer(cockroaches,isDesktop);
 		Gdx.input.setInputProcessor(new EnvironmentEventsHandler(cockroaches));
 	}
 

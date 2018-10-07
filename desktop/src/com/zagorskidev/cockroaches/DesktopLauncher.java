@@ -19,6 +19,6 @@ public class DesktopLauncher {
 		config.height = 700;
 		config.width = 400;
 		
-		return new LwjglApplication(new Cockroaches(), config);
+		return new LwjglApplication(new Cockroaches(true), config);
 	}
 }

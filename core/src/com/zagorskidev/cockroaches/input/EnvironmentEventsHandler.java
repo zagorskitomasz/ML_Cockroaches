@@ -14,7 +14,6 @@ public class EnvironmentEventsHandler extends InputAdapter {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		
 		cockroaches.processHit(scaleX(screenX), scaleY(screenY));
 		return true;
 	}
