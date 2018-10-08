@@ -7,7 +7,7 @@ public class Parameters {
 	public static final int GAME_WIDTH = Gdx.graphics.getWidth();
 	public static final int GAME_HEIGHT = Gdx.graphics.getHeight();
 	
-	public static final long BIRTH_INTERVAL = 2000;
+	public static final long BIRTH_INTERVAL = 50;
 	public static final long MOVE_INTERVAL = 0;
 
 	public static final int X_FIELDS = 100;
@@ -26,7 +26,7 @@ public class Parameters {
 	public static final int ESCAPE_THRESHOLD = (int)(X_FIELDS * 0.6);
 	
 	public static final int HIT_THRESHOLD = 0;
-	public static final int GENOME_SIZE = 5;
-	public static final int MUTATION_PROBABILITY = 5;
+	public static final int GENOME_SIZE = 20;
+	public static final int MUTATION_PROBABILITY = 10;
 	public static final int SWITCH_PROBABILITY = 10;	
 }

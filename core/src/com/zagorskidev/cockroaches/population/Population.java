@@ -10,10 +10,12 @@ public class Population {
 
 	private Collection<Cockroach> cockroaches;
 	private Genome genome;
+	private long counter;
 	
 	public Population(Genome genome) {
 		cockroaches = new ConcurrentLinkedQueue<>();
 		this.genome = genome;
+		counter = 0;
 	}
 	
 	public void birth() {
@@ -47,7 +49,10 @@ public class Population {
 	}
 
 	public void processEscape(Cockroach cockroach) {
-		genome.addSequence(new SuperSequence(cockroach.propagateSequence()));
+		if(cockroach.propagateSequence() != null) {
+			genome.addSequence(cockroach.propagateSequence());
+			System.out.println("Success count: " + ++counter);
+		}
 		cockroaches.remove(cockroach);
 	}
 

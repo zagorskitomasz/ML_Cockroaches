@@ -38,10 +38,17 @@ public class Cockroach {
 	}
 
 	private boolean escaped() {
-		return Math.sqrt(
+		if(Math.sqrt(
 					Math.pow(x - Parameters.X_ESCAPE, 2) + 
 					Math.pow(y - Parameters.Y_ESCAPE, 2)) 
-				<= Parameters.ESCAPE_THRESHOLD;
+				<= Parameters.ESCAPE_THRESHOLD)
+			return true;
+		
+		if(x < 0 || x > Parameters.X_FIELDS || y < 0 || y > Parameters.Y_FIELDS) {
+			propagatedSequence = null;
+			return true;
+		}
+		return false;
 	}
 
 	public int getX() {

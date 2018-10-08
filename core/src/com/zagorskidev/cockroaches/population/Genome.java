@@ -2,27 +2,29 @@ package com.zagorskidev.cockroaches.population;
 
 import java.util.AbstractMap.SimpleEntry;
 import java.util.Map.Entry;
-import java.util.Set;
-import java.util.TreeSet;
 import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.google.common.collect.Multiset;
+import com.google.common.collect.TreeMultiset;
 import com.zagorskidev.cockroaches.system.Parameters;
 
 public class Genome {
 
-	private Set<Entry<Sequence, Long>> genome;
-	private long probabilitySum;
+	private Multiset<Entry<Sequence, Double>> genome;
+	private double probabilitySum;
+	private double lastSeq;
 
 	private ReentrantLock lock;
 	
 	public Genome() {
 		lock = new ReentrantLock();
 		
-		genome = new TreeSet<>((b, a) -> {
+		genome = TreeMultiset.create((b, a) -> {
 			return Integer.compare(a.getKey().getLength(), b.getKey().getLength());
 		});
 		probabilitySum = 0;
+		lastSeq = 1;
 	}
 	
 	public Sequence getNextSequence() {		
@@ -39,8 +41,8 @@ public class Genome {
 	}
 
 	private Sequence createChild() {
-		Entry<Sequence, Long> firstParent = getNextParent();
-		Entry<Sequence, Long> secondParent;
+		Entry<Sequence, Double> firstParent = getNextParent();
+		Entry<Sequence, Double> secondParent;
 		do
 			secondParent = getNextParent();
 		while(firstParent == secondParent);
@@ -48,9 +50,9 @@ public class Genome {
 		return new CrossingOver().cross(firstParent.getKey(), secondParent.getKey());
 	}
 
-	private Entry<Sequence, Long> getNextParent() {
-		long index = ThreadLocalRandom.current().nextLong(probabilitySum);
-		for(Entry<Sequence, Long> sequence : genome) {
+	private Entry<Sequence, Double> getNextParent() {
+		double index = ThreadLocalRandom.current().nextDouble(probabilitySum);
+		for(Entry<Sequence, Double> sequence : genome) {
 			if(index < sequence.getValue())
 				return sequence;
 		}
@@ -61,7 +63,8 @@ public class Genome {
 		lock.lock();
 		try {
 			propagatedSequence.mutate();
-			genome.add(new SimpleEntry<>(propagatedSequence, 0l));
+			genome.add(new SimpleEntry<>(propagatedSequence, 0d));
+			lastSeq = propagatedSequence.getLength();
 			trim();
 			enumerate();
 			
@@ -74,17 +77,17 @@ public class Genome {
 
 	private void trim() {
 		if(genome.size() > Parameters.GENOME_SIZE) {
-			Entry<Sequence, Long> shortestSequence = genome.iterator().next();
-			genome.remove(shortestSequence);
+			Entry<Sequence, Double> longestSequence = genome.iterator().next();
+			genome.remove(longestSequence);
 			
-			System.out.println("Removed sequence with length " + shortestSequence.getKey().getLength());
+			System.out.println("Removed sequence with length " + longestSequence.getKey().getLength());
 		}
 	}
 
 	private void enumerate() {
 		probabilitySum = 0;
-		for(Entry<Sequence, Long> sequence : genome) {
-			probabilitySum += sequence.getKey().getLength();
+		for(Entry<Sequence, Double> sequence : genome) {
+			probabilitySum += lastSeq / Math.pow(sequence.getKey().getLength(), 2);
 			sequence.setValue(probabilitySum);
 		}
 	}
