@@ -1,10 +1,7 @@
 package com.zagorskidev.cockroaches.population;
 
 import java.util.Collection;
-import java.util.Iterator;
 import java.util.concurrent.ConcurrentLinkedQueue;
-
-import com.zagorskidev.cockroaches.system.Parameters;
 
 public class Population {
 
@@ -19,41 +16,36 @@ public class Population {
 	}
 	
 	public void birth() {
-		Sequence sequence = genome.getNextSequence();
-		cockroaches.add(new Cockroach(sequence));
+		Genotype genotype = genome.getNextGenotype();
+		
+		Fenotype fenotype;
+		
+		if(genotype == null)
+			fenotype = new Fenotype();
+		else
+			fenotype = new Fenotype(genotype);
+			
+		cockroaches.add(new Cockroach(fenotype));
 	}
 
 	public Collection<Cockroach> getCockroaches() {
 		return cockroaches;
 	}
 
-	public void processHit(int x, int y) {
-		Iterator<Cockroach> iterator = cockroaches.iterator();
-		
-		while(iterator.hasNext()){
-			Cockroach cockroach = iterator.next();
-			if(gotHit(cockroach, x, y)){
-				extractSequence(cockroach);
-				iterator.remove();
-			}
-		}
-	}
-
-	private boolean gotHit(Cockroach cockroach, int x, int y) {
-		return Math.abs(x - cockroach.getX()) <= Parameters.HIT_THRESHOLD 
-				&& Math.abs(y - cockroach.getY()) <= Parameters.HIT_THRESHOLD;
-	}
-
-	private void extractSequence(Cockroach cockroach) {
-		genome.addSequence(cockroach.propagateSequence());
-	}
-
 	public void processEscape(Cockroach cockroach) {
-		if(cockroach.propagateSequence() != null) {
-			genome.addSequence(cockroach.propagateSequence());
-			System.out.println("Success count: " + ++counter);
-		}
+		
+		Chromosome chromosome = cockroach.propagateChromosome();
+		double chromosomeAttractivity = calculateAttractivity(cockroach.getSuccessDist(), chromosome.getLength()); 
+				
+		genome.addChromosome(chromosome, chromosomeAttractivity);
+		System.out.println("Success count: " + ++counter);
+		
 		cockroaches.remove(cockroach);
+	}
+
+	private double calculateAttractivity(double successDist, int length) {
+		
+		return (100 / successDist) * (1000 / length); 
 	}
 
 }

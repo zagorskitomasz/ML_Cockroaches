@@ -74,4 +74,9 @@ public class CrossingOver {
 			counter++;
 		}
 	}
+
+	public Chromosome cross(Genotype genotype) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 }

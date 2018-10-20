@@ -1,7 +1,6 @@
 package com.zagorskidev.cockroaches.population;
 
-import com.zagorskidev.cockroaches.system.CoordsGenerator;
-import com.zagorskidev.cockroaches.system.Movement;
+import com.zagorskidev.cockroaches.system.Direction;
 import com.zagorskidev.cockroaches.system.Parameters;
 
 public class Cockroach {
@@ -9,45 +8,48 @@ public class Cockroach {
 	private int x;
 	private int y;
 	
-	private Sequence inheritedSequence;
-	private Sequence propagatedSequence;
+	private Direction direction;
+	private double successDist;
+	
+	private Fenotype fenotype;
 
-	public Cockroach(Sequence sequence) {
-		inheritedSequence = sequence;
-		propagatedSequence = new GeneticSequence();
+	public Cockroach(Fenotype fenotype) {
+		this.fenotype = fenotype;
+		
+		successDist = Double.POSITIVE_INFINITY;
+		direction = Parameters.DEFAULT_DIRECTION;
 		generateCoords();
 	}
 
 	private void generateCoords() {
-		CoordsGenerator generator = CoordsGenerator.getInstance();
-		x = generator.getCockroachX();
-		y = generator.getCockroachY();
+		x = Parameters.X_SPAWN;
+		y = Parameters.Y_SPAWN;
 	}
 
 	public boolean move() {
-		Movement movement = inheritedSequence.getNextMovement();
-		move(movement);
-		propagatedSequence.addMovement(movement);
+		direction = fenotype.processNextStep(direction);
+		doMove();
 		
 		return escaped();
 	}
 
-	private void move(Movement movement) {
-		x += movement.getDeltaX();
-		y += movement.getDeltaY();
+	private void doMove() {
+		x += direction.X;
+		y += direction.Y;
 	}
 
 	private boolean escaped() {
-		if(Math.sqrt(
-					Math.pow(x - Parameters.X_ESCAPE, 2) + 
-					Math.pow(y - Parameters.Y_ESCAPE, 2)) 
-				<= Parameters.ESCAPE_THRESHOLD)
+		
+		successDist = Math.sqrt(
+				Math.pow(x - Parameters.X_ESCAPE, 2) + 
+				Math.pow(y - Parameters.Y_ESCAPE, 2));
+		
+		if(successDist <= Parameters.ESCAPE_THRESHOLD)
 			return true;
 		
-		if(x < 0 || x > Parameters.X_FIELDS || y < 0 || y > Parameters.Y_FIELDS) {
-			propagatedSequence = null;
+		if(x < 0 || x > Parameters.X_FIELDS || y < 0 || y > Parameters.Y_FIELDS) 
 			return true;
-		}
+			
 		return false;
 	}
 
@@ -59,7 +61,11 @@ public class Cockroach {
 		return y;
 	}
 
-	public Sequence propagateSequence() {
-		return propagatedSequence;
+	public double getSuccessDist() {
+		return successDist;
+	}
+
+	public Chromosome propagateChromosome() {
+		return fenotype.getChromosome();
 	}
 }

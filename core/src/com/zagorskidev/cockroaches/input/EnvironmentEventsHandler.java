@@ -4,6 +4,7 @@ import com.badlogic.gdx.InputAdapter;
 import com.zagorskidev.cockroaches.population.Population;
 import com.zagorskidev.cockroaches.system.Parameters;
 
+@SuppressWarnings("unused")
 public class EnvironmentEventsHandler extends InputAdapter {
 
 	private Population cockroaches;
@@ -14,7 +15,6 @@ public class EnvironmentEventsHandler extends InputAdapter {
 
 	@Override
 	public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-		cockroaches.processHit(scaleX(screenX), scaleY(screenY));
 		return true;
 	}
 

@@ -28,5 +28,8 @@ public class Parameters {
 	public static final int HIT_THRESHOLD = 0;
 	public static final int GENOME_SIZE = 20;
 	public static final int MUTATION_PROBABILITY = 10;
-	public static final int SWITCH_PROBABILITY = 10;	
+	public static final int SWITCH_PROBABILITY = 10;
+	public static final int MOVES_ON_TURN = 20;
+	
+	public static final Direction DEFAULT_DIRECTION = new Direction(0,1);
 }

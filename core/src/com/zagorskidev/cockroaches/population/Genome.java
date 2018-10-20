@@ -91,4 +91,14 @@ public class Genome {
 			sequence.setValue(probabilitySum);
 		}
 	}
+
+	public Genotype getNextGenotype() {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public void addChromosome(Chromosome chromosome, double chromosomeAttractivity) {
+		// TODO Auto-generated method stub
+		
+	}
 }
