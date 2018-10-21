@@ -35,17 +35,17 @@ public class Population {
 	public void processEscape(Cockroach cockroach) {
 		
 		Chromosome chromosome = cockroach.propagateChromosome();
-		double chromosomeAttractivity = calculateAttractivity(cockroach.getSuccessDist(), chromosome.getLength()); 
+		chromosome.setAttractivity(calculateAttractivity(cockroach.getSuccessDist(), chromosome.getLength())); 
 				
-		genome.addChromosome(chromosome, chromosomeAttractivity);
+		genome.addChromosome(chromosome);
 		System.out.println("Success count: " + ++counter);
 		
 		cockroaches.remove(cockroach);
+		cockroaches.size();
 	}
 
 	private double calculateAttractivity(double successDist, int length) {
 		
-		return (100 / successDist) * (1000 / length); 
+		return (10000 / Math.pow(successDist, 2)) * (1000 / (double)length); 
 	}
-
 }

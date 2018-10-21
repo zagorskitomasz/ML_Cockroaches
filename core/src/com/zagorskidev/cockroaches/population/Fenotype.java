@@ -29,7 +29,6 @@ public class Fenotype {
 		fenotype = builder.build();
 		
 		genesIterator = fenotype.iterator();
-		child = new Chromosome();
 	}
 
 	private void createChild(Genotype genotype) {

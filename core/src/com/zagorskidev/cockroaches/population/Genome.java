@@ -11,25 +11,56 @@ import com.zagorskidev.cockroaches.system.Parameters;
 
 public class Genome {
 
-	private Multiset<Entry<Sequence, Double>> genome;
+	private Multiset<Entry<Chromosome, Double>> genome;
 	private double probabilitySum;
-	private double lastSeq;
 
 	private ReentrantLock lock;
 	
 	public Genome() {
 		lock = new ReentrantLock();
 		
-		genome = TreeMultiset.create((b, a) -> {
-			return Integer.compare(a.getKey().getLength(), b.getKey().getLength());
+		genome = TreeMultiset.create((a, b) -> {
+			return Double.compare(a.getKey().getAttractivity(), b.getKey().getAttractivity());
 		});
 		probabilitySum = 0;
-		lastSeq = 1;
 	}
-	
-	public Sequence getNextSequence() {		
+
+	public void addChromosome(Chromosome chromosome) {
+		
+		lock.lock();
+		try {
+			genome.add(new SimpleEntry<>(chromosome, 0d));
+			trim();
+			enumerate();
+			
+			System.out.println("Added chromosome with attractivity " + chromosome.getAttractivity());
+		}
+		finally {
+			lock.unlock();
+		}
+	}
+
+	private void trim() {
+		if(genome.size() > Parameters.GENOME_SIZE) {
+			Entry<Chromosome, Double> weakestChromosome = genome.iterator().next();
+			genome.remove(weakestChromosome);
+			
+			System.out.println("Removed chromosome with attractivity " + weakestChromosome.getKey().getAttractivity());
+		}
+	}
+
+	private void enumerate() {
+		probabilitySum = 0;
+		for(Entry<Chromosome, Double> chromosome : genome) {
+			probabilitySum += chromosome.getKey().getAttractivity();
+			chromosome.setValue(probabilitySum);
+		}
+	}
+
+	public Genotype getNextGenotype() {
+		
 		if(genome.size() < Parameters.GENOME_SIZE)
-			return new RandomSequence();
+			return null;
 		
 		lock.lock();
 		try {
@@ -40,65 +71,34 @@ public class Genome {
 		}
 	}
 
-	private Sequence createChild() {
-		Entry<Sequence, Double> firstParent = getNextParent();
-		Entry<Sequence, Double> secondParent;
+	private Genotype createChild() {
+		Entry<Chromosome, Double> firstParent = getNextParent();
+		Entry<Chromosome, Double> secondParent;
 		do
 			secondParent = getNextParent();
 		while(firstParent == secondParent);
 		
-		return new CrossingOver().cross(firstParent.getKey(), secondParent.getKey());
+		return createChild(firstParent.getKey(), secondParent.getKey());
 	}
 
-	private Entry<Sequence, Double> getNextParent() {
+	private Entry<Chromosome, Double> getNextParent() {
 		double index = ThreadLocalRandom.current().nextDouble(probabilitySum);
-		for(Entry<Sequence, Double> sequence : genome) {
+		for(Entry<Chromosome, Double> sequence : genome) {
 			if(index < sequence.getValue())
 				return sequence;
 		}
 		return null;
 	}
 
-	public void addSequence(Sequence propagatedSequence) {
-		lock.lock();
-		try {
-			propagatedSequence.mutate();
-			genome.add(new SimpleEntry<>(propagatedSequence, 0d));
-			lastSeq = propagatedSequence.getLength();
-			trim();
-			enumerate();
-			
-			System.out.println("Added sequence with length " + propagatedSequence.getLength());
-		}
-		finally {
-			lock.unlock();
-		}
-	}
+	private Genotype createChild(Chromosome firstParent, Chromosome secondParent) {
+		
+		if(firstParent.getLength() < secondParent.getLength())
+			return new Genotype(firstParent, secondParent.trimTo(firstParent.getLength()));
 
-	private void trim() {
-		if(genome.size() > Parameters.GENOME_SIZE) {
-			Entry<Sequence, Double> longestSequence = genome.iterator().next();
-			genome.remove(longestSequence);
-			
-			System.out.println("Removed sequence with length " + longestSequence.getKey().getLength());
-		}
-	}
-
-	private void enumerate() {
-		probabilitySum = 0;
-		for(Entry<Sequence, Double> sequence : genome) {
-			probabilitySum += lastSeq / Math.pow(sequence.getKey().getLength(), 2);
-			sequence.setValue(probabilitySum);
-		}
-	}
-
-	public Genotype getNextGenotype() {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public void addChromosome(Chromosome chromosome, double chromosomeAttractivity) {
-		// TODO Auto-generated method stub
+		if(secondParent.getLength() < firstParent.getLength())
+			return new Genotype(secondParent, firstParent.trimTo(secondParent.getLength()));
+		
+		return new Genotype(firstParent, secondParent);
 		
 	}
 }
