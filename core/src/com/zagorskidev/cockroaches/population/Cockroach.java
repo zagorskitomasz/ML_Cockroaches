@@ -26,7 +26,7 @@ public class Cockroach {
 		y = Parameters.Y_SPAWN;
 	}
 
-	public boolean move() {
+	public GenomeTier move() {
 		direction = fenotype.processNextStep(direction);
 		doMove();
 		
@@ -38,19 +38,19 @@ public class Cockroach {
 		y += direction.Y;
 	}
 
-	private boolean escaped() {
+	private GenomeTier escaped() {
 		
 		successDist = Math.sqrt(
 				Math.pow(x - Parameters.X_ESCAPE, 2) + 
 				Math.pow(y - Parameters.Y_ESCAPE, 2));
 		
 		if(successDist <= Parameters.ESCAPE_THRESHOLD)
-			return true;
+			return GenomeTier.OPTIMIZING;
 		
 		if(x < 0 || x > Parameters.X_FIELDS || y < 0 || y > Parameters.Y_FIELDS) 
-			return true;
+			return GenomeTier.LOOKING_FOR;
 			
-		return false;
+		return null;
 	}
 
 	public int getX() {
@@ -65,7 +65,9 @@ public class Cockroach {
 		return successDist;
 	}
 
-	public Chromosome propagateChromosome() {
-		return fenotype.getChromosome();
+	public Chromosome propagateChromosome(GenomeTier tier) {
+		Chromosome chromosome = fenotype.getChromosome(tier);
+		chromosome.setSuccessDist(successDist);
+		return chromosome;
 	}
 }

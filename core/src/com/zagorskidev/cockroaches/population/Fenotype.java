@@ -1,7 +1,7 @@
 package com.zagorskidev.cockroaches.population;
 
+import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.zagorskidev.cockroaches.system.Direction;
@@ -14,7 +14,7 @@ public class Fenotype {
 	private Chromosome child;
 
 	public Fenotype() {
-		fenotype = new LinkedList<>();
+		fenotype = new ArrayList<>();
 		genesIterator = fenotype.iterator();
 		child = new Chromosome();
 	}
@@ -36,7 +36,8 @@ public class Fenotype {
 		child = crossingOver.cross(genotype);
 	}
 
-	public Chromosome getChromosome() {
+	public Chromosome getChromosome(GenomeTier tier) {
+		child.setTier(tier);
 		return child;
 	}
 

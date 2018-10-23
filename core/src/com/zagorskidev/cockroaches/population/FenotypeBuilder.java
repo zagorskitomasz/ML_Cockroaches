@@ -1,7 +1,6 @@
 package com.zagorskidev.cockroaches.population;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 
 import com.zagorskidev.cockroaches.system.Parameters;
@@ -34,7 +33,7 @@ public class FenotypeBuilder {
 		}
 		while(currentPair.getDistance() <= Parameters.MAX_RECESSIVE_PAIR_DISTANCE);
 		
-		return new LinkedList<>(child);
+		return child;
 	}
 
 	private void findNearestRecessivePair() {

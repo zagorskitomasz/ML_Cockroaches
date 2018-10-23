@@ -32,20 +32,13 @@ public class Population {
 		return cockroaches;
 	}
 
-	public void processEscape(Cockroach cockroach) {
+	public void processEscape(Cockroach cockroach, GenomeTier tier) {
 		
-		Chromosome chromosome = cockroach.propagateChromosome();
-		chromosome.setAttractivity(calculateAttractivity(cockroach.getSuccessDist(), chromosome.getLength())); 
+		Chromosome chromosome = cockroach.propagateChromosome(tier); 
 				
 		genome.addChromosome(chromosome);
-		System.out.println("Success count: " + ++counter);
+		System.out.println(tier.name() + " count: " + ++counter);
 		
 		cockroaches.remove(cockroach);
-		cockroaches.size();
-	}
-
-	private double calculateAttractivity(double successDist, int length) {
-		
-		return (10000 / Math.pow(successDist, 2)) * (1000 / (double)length); 
 	}
 }

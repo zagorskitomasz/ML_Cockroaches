@@ -1,6 +1,7 @@
 package com.zagorskidev.cockroaches.timers;
 
 import com.zagorskidev.cockroaches.population.Cockroach;
+import com.zagorskidev.cockroaches.population.GenomeTier;
 import com.zagorskidev.cockroaches.population.Population;
 import com.zagorskidev.cockroaches.system.Parameters;
 
@@ -21,8 +22,9 @@ public class MoveTimer extends Timer{
 	}
 
 	private void move(Cockroach cockroach) {
-		if(cockroach.move()){
-			cockroaches.processEscape(cockroach);
+		GenomeTier tier = cockroach.move();
+		if(tier != null){
+			cockroaches.processEscape(cockroach,tier);
 		}
 	}
 }
