@@ -9,8 +9,8 @@ public class Genotype {
 	
 	public Genotype(Chromosome firstParent, Chromosome secondParent) {
 		chromosomes = new HashMap<>();
-		chromosomes.put(Chromosomes.A, firstParent);
-		chromosomes.put(Chromosomes.B, secondParent);
+		chromosomes.put(Chromosomes.A, firstParent.mutate());
+		chromosomes.put(Chromosomes.B, secondParent.mutate());
 	}
 
 	public Chromosome getChromosome(Chromosomes chromosomeType) {

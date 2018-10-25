@@ -1,55 +1,66 @@
 package com.zagorskidev.cockroaches.population;
 
 import java.util.AbstractMap.SimpleEntry;
-import java.util.Collection;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ThreadLocalRandom;
 
-import com.google.common.collect.Multiset;
-import com.google.common.collect.TreeMultiset;
 import com.zagorskidev.cockroaches.system.Parameters;
 
 public class Genome {
 	
-	private Map<GenomeTier, Multiset<Entry<Chromosome, Double>>> genome;
+	public enum Action{
+		ADD_CHROMOSOME,
+		GET_GENOTYPE;
+	}
+	
+	private Map<GenomeTier, List<Entry<Chromosome, Double>>> genome;
 	private Map<GenomeTier, Double> probabilitySum;
 	
 	public Genome() {
-		
 		genome = new ConcurrentHashMap<>();
-		genome.put(GenomeTier.LOOKING_FOR, createMultiset());
-		genome.put(GenomeTier.OPTIMIZING, createMultiset());
+		genome.put(GenomeTier.LOOKING_FOR, new ArrayList<>());
+		genome.put(GenomeTier.OPTIMIZING, new ArrayList<>());
 		
 		probabilitySum = new ConcurrentHashMap<>();
 		probabilitySum.put(GenomeTier.LOOKING_FOR, 0d);
 		probabilitySum.put(GenomeTier.OPTIMIZING, 0d);
 	}
-
-	private Multiset<Entry<Chromosome, Double>> createMultiset() {
-		
-		return TreeMultiset.create((a, b) -> {
-			return Double.compare(a.getKey().getAttractivity(), b.getKey().getAttractivity());
-		});
+	
+	public synchronized Object fireAction(Action action, Object param) {
+		switch(action) {
+		case ADD_CHROMOSOME:
+			addChromosome((Chromosome)param);
+			break;
+		case GET_GENOTYPE:
+			return getNextGenotype();
+		}
+		return null;
 	}
 
-	public synchronized void addChromosome(Chromosome chromosome) {
+	private void addChromosome(Chromosome chromosome) {
 		GenomeTier tier = chromosome.getTier();
 			
 		genome.get(tier).add(new SimpleEntry<>(chromosome, 0d));
+		System.out.println("Added " + tier.name() + " chromosome with attractivity " + chromosome.getAttractivity());
+		
+		genome.get(tier).sort((a, b) -> {
+			return Double.compare(a.getKey().getAttractivity(), b.getKey().getAttractivity());
+		});
+		
 		trim(tier);
 		enumerate(tier);
 		
-		System.out.println("Added " + tier.name() + " chromosome with attractivity " + chromosome.getAttractivity());
 	}
 
 	private void trim(GenomeTier tier) {
 		if(genome.get(tier).size() > Parameters.GENOME_SIZE) {
-			Entry<Chromosome, Double> weakestChromosome = genome.get(tier).iterator().next();
-			genome.get(tier).remove(weakestChromosome);
+			Chromosome weakestChromosome = genome.get(tier).remove(0).getKey();
 			
-			System.out.println("Removed " + tier.name() + " chromosome with attractivity " + weakestChromosome.getKey().getAttractivity());
+			System.out.println("Removed " + tier.name() + " chromosome with attractivity " + weakestChromosome.getAttractivity());
 		}
 	}
 
@@ -62,7 +73,7 @@ public class Genome {
 		}
 	}
 
-	public synchronized Genotype getNextGenotype() {
+	private Genotype getNextGenotype() {
 		
 		if(genome.get(GenomeTier.LOOKING_FOR).size() < Parameters.GENOME_SIZE)
 			return null;
@@ -80,20 +91,13 @@ public class Genome {
 			secondParent = getNextParent(tier);
 		while(firstParent == secondParent);
 		
-		mutate(firstParent.getKey());
-		mutate(secondParent.getKey());
-		
 		return createChild(firstParent.getKey(), secondParent.getKey());
-	}
-
-	private void mutate(Chromosome chromosome) {
-		chromosome.mutate();
 	}
 
 	private Entry<Chromosome, Double> getNextParent(GenomeTier tier) {
 		double index = ThreadLocalRandom.current().nextDouble(probabilitySum.get(tier));
 		int loop = 0;
-		for(Entry<Chromosome, Double> sequence : (Collection<Entry<Chromosome, Double>>)(genome.get(tier))) {
+		for(Entry<Chromosome, Double> sequence : genome.get(tier)) {
 			loop++;
 			if(index < sequence.getValue()) {
 				System.out.println("\t\t\t\t\t\tIndex: " + index + " sum: " + probabilitySum.get(tier) + " loop: " + loop);

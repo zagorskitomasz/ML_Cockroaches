@@ -62,11 +62,12 @@ public class Chromosome {
 		return tier;
 	}
 
-	public void mutate() {
-		for(int i = 0; i < genes.size(); i++){
-			if(ThreadLocalRandom.current().nextInt(100) < Parameters.MUTATION_PROBABILITY)
-				genes.set(i, Gene.getRandom());
+	public Chromosome mutate() {
+		List<Gene> mutated = new ArrayList<>(genes);
+		for(int i = 0; i < (Parameters.MUTATION_PROBABILITY * mutated.size()) / 100; i++){
+			mutated.set(ThreadLocalRandom.current().nextInt(mutated.size()), Gene.getRandom());
 		}
+		return new Chromosome(mutated);
 	}
 	
 	public void setSuccessDist(double successDist) {

@@ -16,7 +16,7 @@ public class Population {
 	}
 	
 	public void birth() {
-		Genotype genotype = genome.getNextGenotype();
+		Genotype genotype = (Genotype)genome.fireAction(Genome.Action.GET_GENOTYPE, null);
 		
 		Fenotype fenotype;
 		
@@ -36,7 +36,7 @@ public class Population {
 		
 		Chromosome chromosome = cockroach.propagateChromosome(tier); 
 				
-		genome.addChromosome(chromosome);
+		genome.fireAction(Genome.Action.ADD_CHROMOSOME, chromosome);
 		System.out.println(tier.name() + " count: " + ++counter);
 		
 		cockroaches.remove(cockroach);
