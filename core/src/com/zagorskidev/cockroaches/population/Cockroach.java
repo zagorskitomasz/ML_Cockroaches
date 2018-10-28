@@ -2,6 +2,7 @@ package com.zagorskidev.cockroaches.population;
 
 import com.zagorskidev.cockroaches.system.Direction;
 import com.zagorskidev.cockroaches.system.Parameters;
+import com.zagorskidev.cockroaches.system.WallHitValidator;
 
 public class Cockroach {
 
@@ -10,6 +11,7 @@ public class Cockroach {
 	
 	private Direction direction;
 	private double successDist;
+	private WallHitValidator wallHitValidator;
 	
 	private Fenotype fenotype;
 
@@ -19,11 +21,13 @@ public class Cockroach {
 		successDist = Double.POSITIVE_INFINITY;
 		direction = Parameters.DEFAULT_DIRECTION;
 		generateCoords();
+		
+		wallHitValidator = WallHitValidator.getInstance();
 	}
 
 	private void generateCoords() {
-		x = Parameters.X_SPAWN;
-		y = Parameters.Y_SPAWN;
+		x = (int)Parameters.X_SPAWN;
+		y = (int)Parameters.Y_SPAWN;
 	}
 
 	public GenomeTier move() {
@@ -47,7 +51,7 @@ public class Cockroach {
 		if(successDist <= Parameters.ESCAPE_THRESHOLD)
 			return GenomeTier.OPTIMIZING;
 		
-		if(x < 0 || x > Parameters.X_FIELDS || y < 0 || y > Parameters.Y_FIELDS) 
+		if(wallHitValidator.validate(x, y)) 
 			return GenomeTier.LOOKING_FOR;
 			
 		return null;

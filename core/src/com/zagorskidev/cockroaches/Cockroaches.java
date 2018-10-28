@@ -16,6 +16,7 @@ import com.zagorskidev.cockroaches.timers.Timer;
 public class Cockroaches extends ApplicationAdapter {
 	
 	private final boolean isDesktop;
+	private boolean started;
 	
 	private List<Timer> timers;
 	private Drawer drawer;
@@ -46,18 +47,24 @@ public class Cockroaches extends ApplicationAdapter {
 
 	private void initializeGameEngine() {
 		drawer = new Drawer(cockroaches,isDesktop);
-		Gdx.input.setInputProcessor(new EnvironmentEventsHandler(cockroaches));
+		Gdx.input.setInputProcessor(new EnvironmentEventsHandler(this));
 	}
 
 	@Override
 	public void render () {
-		for(Timer timer : timers)
-			timer.checkAndPerform();
+		if(started) {
+			for(Timer timer : timers)
+				timer.checkAndPerform();
+		}
 		drawer.draw();
 	}
 	
 	@Override
 	public void dispose () {
 		drawer.dispose();
+	}
+	
+	public void start() {
+		started = true;
 	}
 }

@@ -10,26 +10,26 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.zagorskidev.cockroaches.population.Cockroach;
 import com.zagorskidev.cockroaches.population.Population;
 import com.zagorskidev.cockroaches.system.Parameters;
+import com.zagorskidev.cockroaches.system.Wall;
+import com.zagorskidev.cockroaches.system.WallHitValidator;
 
 public class Drawer {
 
 	private Collection<Cockroach> cockroaches;
-	private ShapeRenderer renderer;
+	private Collection<Wall> walls;
 	
-	private boolean drawMouseShadow;
+	private ShapeRenderer renderer;
 	
 	public Drawer(Population cockroaches, boolean isDesktop) {
 		this.cockroaches = cockroaches.getCockroaches();
+		walls = WallHitValidator.getInstance().getWalls();
 		renderer = new ShapeRenderer();
-		drawMouseShadow = isDesktop;
 	}
 
 	public void draw() {
 		clear();
+		drawWalls();
 		drawCockroaches();
-		
-		if(drawMouseShadow)
-			drawMouseShadow();
 		
 		if(Parameters.ESCAPE_THRESHOLD > 0)
 			drawEscapeThreshold();
@@ -53,26 +53,36 @@ public class Drawer {
 		renderer.ellipse(x, y, Parameters.COCKROACH_RADIUS, Parameters.COCKROACH_RADIUS);
 	}
 
-	private float scale(float coord) {
-		return coord * Parameters.COCKROACH_RADIUS;
-	}
-	
-	private void drawMouseShadow() {
+	private void drawWalls() {
+		
 		renderer.setColor(Color.RED);
-		renderer.begin(ShapeType.Line);
+		renderer.begin(ShapeType.Filled);
 		
-		int radius = (int)(Parameters.HIT_THRESHOLD * Parameters.COCKROACH_RADIUS);
-		
-		int x = Gdx.input.getX() - radius;
-		int y = Parameters.GAME_HEIGHT - Gdx.input.getY() - radius;
-		renderer.ellipse(x, y, radius * 2, radius * 2);
+		for(Wall wall : walls)
+			drawWall(wall);
 		
 		renderer.end();
 	}
 
+	private void drawWall(Wall wall) {
+		
+		float xBegin = scale(wall.getBegin().x);
+		float yBegin = scale(wall.getBegin().y);
+		
+		float xEnd = scale(wall.getEnd().x);
+		float yEnd = scale(wall.getEnd().y);
+		
+		renderer.rectLine(xBegin, yBegin, xEnd, yEnd, scale(Parameters.WALL_WIDTH * 2));
+	}
+
+	private float scale(float coord) {
+		return coord * Parameters.COCKROACH_RADIUS;
+	}
+
 	private void drawEscapeThreshold() {
+		
 		renderer.setColor(Color.GREEN);
-		renderer.begin(ShapeType.Line);
+		renderer.begin(ShapeType.Filled);
 		
 		int radius = (int)(Parameters.ESCAPE_THRESHOLD * Parameters.COCKROACH_RADIUS);
 		
@@ -91,5 +101,4 @@ public class Drawer {
 	public void dispose() {
 		renderer.dispose();
 	}
-
 }

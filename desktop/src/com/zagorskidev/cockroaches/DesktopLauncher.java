@@ -16,8 +16,8 @@ public class DesktopLauncher {
 		
 		config.title = "Cockroaches";
 		config.useGL30 = true;
-		config.height = 800;
-		config.width = 1050;
+		config.height = 700;
+		config.width = 700;
 		
 		return new LwjglApplication(new Cockroaches(true), config);
 	}
