@@ -30,4 +30,5 @@ public class Parameters {
 	
 	public static final Direction DEFAULT_DIRECTION = new Direction(0,1);
 	public static final float WALL_WIDTH = 2;
+	public static final boolean TRIM = true;
 }

@@ -1,8 +1,10 @@
-package com.zagorskidev.cockroaches.system;
+package com.zagorskidev.cockroaches.walls;
 
-import java.awt.Point;
 import java.util.LinkedList;
 import java.util.List;
+
+import com.badlogic.gdx.math.Vector2;
+import com.zagorskidev.cockroaches.system.Parameters;
 
 public class WallHitValidator {
 
@@ -24,10 +26,10 @@ public class WallHitValidator {
 	
 	private void initWalls() {
 		
-		Point leftDown = new Point(0, 0);
-		Point leftUp = new Point(0, (int)Parameters.Y_FIELDS);
-		Point rightDown = new Point((int)Parameters.X_FIELDS, 0);
-		Point rightUp = new Point((int)Parameters.X_FIELDS, (int)Parameters.Y_FIELDS);
+		Vector2 leftDown = new Vector2(0, 0);
+		Vector2 leftUp = new Vector2(0, (int)Parameters.Y_FIELDS);
+		Vector2 rightDown = new Vector2((int)Parameters.X_FIELDS, 0);
+		Vector2 rightUp = new Vector2((int)Parameters.X_FIELDS, (int)Parameters.Y_FIELDS);
 		
 		walls.add(new Wall(leftDown, leftUp));
 		walls.add(new Wall(leftUp, rightUp));
@@ -38,7 +40,7 @@ public class WallHitValidator {
 	public boolean validate(int x, int y) {
 
 		for(Wall wall : walls) {
-			if(wall.distanceTo(x, y) <= Parameters.WALL_WIDTH)
+			if(wall.distanceTo(new Vector2(x, y)) <= Parameters.WALL_WIDTH)
 				return true;
 		}
 		return false;
@@ -48,7 +50,7 @@ public class WallHitValidator {
 		return walls;
 	}
 
-	public void addWall(Point begin, Point end) {
-		walls.add(new Wall(begin, end));
+	public void addWall(Wall wall) {
+		walls.add(wall);
 	}
 }

@@ -10,8 +10,8 @@ import com.badlogic.gdx.graphics.glutils.ShapeRenderer.ShapeType;
 import com.zagorskidev.cockroaches.population.Cockroach;
 import com.zagorskidev.cockroaches.population.Population;
 import com.zagorskidev.cockroaches.system.Parameters;
-import com.zagorskidev.cockroaches.system.Wall;
-import com.zagorskidev.cockroaches.system.WallHitValidator;
+import com.zagorskidev.cockroaches.walls.Wall;
+import com.zagorskidev.cockroaches.walls.WallHitValidator;
 
 public class Drawer {
 

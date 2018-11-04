@@ -3,7 +3,7 @@ package com.zagorskidev.cockroaches.input;
 import com.badlogic.gdx.InputAdapter;
 import com.zagorskidev.cockroaches.Cockroaches;
 import com.zagorskidev.cockroaches.system.Parameters;
-import com.zagorskidev.cockroaches.timers.Timer;
+import com.zagorskidev.cockroaches.walls.WallsFactory;
 
 public class EnvironmentEventsHandler extends InputAdapter {
 

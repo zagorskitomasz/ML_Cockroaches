@@ -55,6 +55,10 @@ public class Chromosome {
 	}
 
 	public void setTier(GenomeTier tier) {
+		
+		if(Parameters.TRIM && GenomeTier.LOOKING_FOR.equals(tier))
+			genes = genes.subList(0, Math.max(0, genes.size() - (int)(Parameters.X_FIELDS * 0.1)));
+		
 		this.tier = tier;
 	}
 	

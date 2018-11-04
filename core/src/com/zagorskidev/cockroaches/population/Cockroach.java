@@ -2,7 +2,8 @@ package com.zagorskidev.cockroaches.population;
 
 import com.zagorskidev.cockroaches.system.Direction;
 import com.zagorskidev.cockroaches.system.Parameters;
-import com.zagorskidev.cockroaches.system.WallHitValidator;
+import com.zagorskidev.cockroaches.walls.SuccessDistCalculator;
+import com.zagorskidev.cockroaches.walls.WallHitValidator;
 
 public class Cockroach {
 
@@ -44,17 +45,18 @@ public class Cockroach {
 
 	private GenomeTier escaped() {
 		
-		successDist = Math.sqrt(
-				Math.pow(x - Parameters.X_ESCAPE, 2) + 
-				Math.pow(y - Parameters.Y_ESCAPE, 2));
+		SuccessDistCalculator calculator = new SuccessDistCalculator();
+		
+		successDist = calculator.calculateStraightEscapeDist(x, y);
 		
 		if(successDist <= Parameters.ESCAPE_THRESHOLD)
 			return GenomeTier.OPTIMIZING;
 		
-		if(wallHitValidator.validate(x, y)) 
+		if(!wallHitValidator.validate(x, y))
+			return null;
+		
+		successDist = calculator.calculate(x, y);
 			return GenomeTier.LOOKING_FOR;
-			
-		return null;
 	}
 
 	public int getX() {

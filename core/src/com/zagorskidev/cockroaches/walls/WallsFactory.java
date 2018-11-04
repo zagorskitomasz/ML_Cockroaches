@@ -1,8 +1,6 @@
-package com.zagorskidev.cockroaches.input;
+package com.zagorskidev.cockroaches.walls;
 
-import java.awt.Point;
-
-import com.zagorskidev.cockroaches.system.WallHitValidator;
+import com.badlogic.gdx.math.Vector2;
 
 public class WallsFactory {
 	
@@ -16,10 +14,12 @@ public class WallsFactory {
 	}
 	
 	private WallHitValidator validator;
-	private Point begin;
+	private WallsValidator wallsValidator;
+	private Vector2 begin;
 
 	private WallsFactory() {
 		validator = WallHitValidator.getInstance();
+		wallsValidator = new WallsValidator();
 	}
 
 	public void addPoint(float x, float y) {
@@ -31,12 +31,14 @@ public class WallsFactory {
 
 	private void addNextPoint(float x, float y) {
 		
-		Point point = new Point((int)x, (int)y);
+		Vector2 point = new Vector2((int)x, (int)y);
 		
 		if(begin == null)
 			begin = point;
 		else {
-			validator.addWall(begin, point);
+			Wall wall = new Wall(begin, point);
+			if(wallsValidator.validate(wall))
+				validator.addWall(wall);
 			begin = null;
 		}
 	}
